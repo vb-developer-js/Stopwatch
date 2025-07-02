@@ -20,18 +20,29 @@ class Program
         Console.WriteLine("M - Minuto (1m)");
         Console.WriteLine("0 - Sair");
 
-        string input = ValidarEntrada(Console.ReadLine());
-        int time = int.Parse(input.Substring(0, input.Length == 1 ? 1 : input.Length - 1));
-        int multiplier = 1;
+        int time;
+        string input = ValidationInput(Console.ReadLine());
+        string inputNumber = input.Substring(0, input.Length == 1 ? 1 : input.Length - 1);
+        Console.WriteLine("Chegou aquii??");
 
-        if (time == 0)
-            System.Environment.Exit(0);
+        if (int.TryParse(inputNumber, out time))
+        {
+            int multiplier = 1;
+            if (time == 0)
+                System.Environment.Exit(0);
 
-        char type = char.Parse(input.Substring(input.Length - 1, 1));
-        if (type == 'm')
-            multiplier = 60;
+            char type = char.Parse(input.Substring(input.Length - 1, 1));
+            if (type == 'm')
+                multiplier = 60;
 
-        Start(time * multiplier);
+            Start(time * multiplier);
+        }
+        else
+        {
+            Console.WriteLine("O tempo informado excede o limite máximo, pressione qualquer tecla para voltar ao menu...");
+            Console.ReadKey();
+            Menu();
+        }
     }
 
     static void Start(int time)
@@ -51,50 +62,27 @@ class Program
         Menu();
     }
 
-    static bool RequiredInput(string? input)
-    {
-        if (String.IsNullOrWhiteSpace(input))
+    static string ValidationInput(string? input)
+    {    
+        do
         {
-            Console.WriteLine("É obrigatório informar uma opção. Verifique!");
-            return false;
-        }
-        else
-        {
-            return CurrentFormat(input);
-        }
-    }
-
-    static bool CurrentFormat(string input)
-    {
-        string pattern = @"^\d+[sSmM]$";
-        bool result = Regex.IsMatch(input, pattern);
-        if (!result)
-            Console.WriteLine("É obrigatório estar no formato correto. Verifique!");
-
-        return result;
-    }
-
-    static string ValidarEntrada(string? input)
-    {
-        bool result = false;
-        while (!result)
-        {
-            if (String.IsNullOrWhiteSpace(input))
+            while (String.IsNullOrEmpty(input))
             {
                 Console.WriteLine("É obrigatório informar uma opção. Verifique!");
                 input = Console.ReadLine();
             }
-            else
+
+            bool isMatch;
+            do
             {
                 string pattern = @"^\d+[sSmM]$";
-                bool result = Regex.IsMatch(input, pattern);
-                if (!result)
+                isMatch = Regex.IsMatch(input, pattern);
+                if (!isMatch)
                     Console.WriteLine("É obrigatório estar no formato correto. Verifique!");
-
-                input = Console.ReadLine();
-            }
+                    input = Console.ReadLine();
+            } while (!isMatch && !String.IsNullOrEmpty(input));
         }
-
+        while (String.IsNullOrEmpty(input));
         return input;
     }
 }
